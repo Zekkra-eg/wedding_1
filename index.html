@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>A Little Surprise</title>
+    <style>
+      :root { --ink: #231f35; --cream: #fffaf4; --rose: #f5d4d2; --lilac: #dcd3f4; --accent: #c84f67; }
+      * { box-sizing: border-box; }
+      body { margin: 0; min-height: 100vh; color: var(--ink); background: radial-gradient(circle at 18% 18%, #fff 0 9%, transparent 28%), linear-gradient(135deg, #f7e9df, #ded7f1); font-family: Georgia, 'Times New Roman', serif; }
+      button, a { font: inherit; }
+      .screen { min-height: 100svh; display: grid; place-items: center; padding: 0; overflow: hidden; background: #171225; }
+      .screen[hidden] { display: none !important; }
+      .card { position: relative; isolation: isolate; width: min(100vw, 56.25svh); height: 100svh; min-height: 100svh; text-align: center; color: white; background: #2e294e; overflow: hidden; }
+      .card::after { content: ''; position: absolute; z-index: 1; inset: 0; pointer-events: none; background: linear-gradient(180deg, rgba(16,10,27,.55), transparent 30%, transparent 58%, rgba(16,10,27,.78)); }
+      .eyebrow { position: absolute; z-index: 2; top: max(25px, env(safe-area-inset-top)); left: 24px; right: 24px; margin: 0; color: #ffdfe7; font: 700 11px/1.2 Arial, sans-serif; letter-spacing: .2em; text-transform: uppercase; }
+      h1 { position: absolute; z-index: 2; top: calc(max(25px, env(safe-area-inset-top)) + 25px); left: 24px; right: 24px; margin: 0; font-size: clamp(2rem, 7vw, 4.5rem); font-weight: 500; letter-spacing: -.05em; text-shadow: 0 2px 16px rgba(0,0,0,.34); }
+      .subcopy { position: absolute; z-index: 2; left: 25px; right: 25px; bottom: 150px; max-width: 450px; margin: 0 auto; color: rgba(255,255,255,.92); font: 15px/1.5 Arial, sans-serif; text-shadow: 0 1px 10px rgba(0,0,0,.38); }
+      .media-frame { position: absolute; z-index: 0; inset: 0; overflow: hidden; width: 100%; height: 100%; margin: 0; background: #2e294e; }
+      .placeholder-art { width: 100%; height: 100%; display: grid; place-items: center; background: radial-gradient(circle at 67% 28%, #f9c7c7 0 5%, transparent 5.5%), radial-gradient(circle at 35% 65%, #bcb1ea 0 8%, transparent 8.5%), linear-gradient(125deg, #312853, #a7658a); color: white; }
+      .placeholder-art span { padding: 12px 17px; border: 1px solid rgba(255,255,255,.65); border-radius: 99px; background: rgba(37,25,62,.28); font: 700 12px Arial, sans-serif; letter-spacing: .15em; text-transform: uppercase; }
+      video, .gif-placeholder { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+      video { z-index: 1; background: transparent; }
+      .placeholder-art { position: absolute; inset: 0; }
+      .play-mark { position: absolute; z-index: 2; inset: 0; display: grid; place-items: center; pointer-events: none; }
+      .play-mark i { display: grid; place-items: center; width: 72px; height: 72px; border-radius: 50%; color: var(--ink); background: rgba(255,255,255,.89); font-style: normal; font-family: Arial, sans-serif; padding-left: 4px; }
+      .primary, .choice { display: inline-flex; align-items: center; justify-content: center; min-height: 57px; border: 0; border-radius: 999px; cursor: pointer; text-decoration: none; transition: transform .2s ease, box-shadow .2s ease; }
+      .primary { position: absolute; z-index: 3; bottom: max(52px, calc(env(safe-area-inset-bottom) + 24px)); left: 24px; right: 24px; width: calc(100% - 48px); padding: 0 30px; color: white; background: var(--accent); box-shadow: 0 12px 24px rgba(0,0,0,.3); }
+      .primary:hover, .choice:hover { transform: translateY(-3px); }
+      .hint { position: absolute; z-index: 2; bottom: max(21px, env(safe-area-inset-bottom)); left: 15px; right: 15px; margin: 0; color: rgba(255,255,255,.75); font: 11px Arial, sans-serif; }
+      #intro .eyebrow, #intro h1, #intro .subcopy, #intro .play-mark, #intro .primary, #intro .hint { display: none; }
+      #intro .media-frame { cursor: pointer; }
+      #celebration { display: none; }
+      #celebration .eyebrow, #celebration h1, #celebration .subcopy, #celebration .choices, #celebration .back { display: none; }
+      #celebration { min-height: 0; height: auto; overflow: visible; background: #171225; }
+      #celebration .card { width: min(1366px, 100%); height: auto; min-height: 0; aspect-ratio: 1366 / 5573; margin: 0 auto; overflow: hidden; }
+      #celebration .card::after { display: none; }
+      #celebration .media-frame { position: relative; inset: auto; width: 100%; height: 100%; }
+      #celebration video { position: relative; display: block; width: 100%; height: 100%; object-fit: fill; }
+      .gif-placeholder { display: grid; place-items: center; background: repeating-linear-gradient(-45deg, #b97091 0 18px, #d993ac 18px 36px); }
+      .gif-placeholder div { padding: 24px; text-align: center; color: white; border-radius: 18px; background: rgba(52,26,58,.19); }
+      .gif-placeholder strong { display: block; margin-bottom: 8px; font-size: clamp(2rem, 6vw, 4.8rem); font-weight: 400; }
+      .gif-placeholder small { font: 700 11px Arial, sans-serif; letter-spacing: .2em; text-transform: uppercase; }
+      .choices { position: absolute; z-index: 3; left: 24px; right: 24px; bottom: max(49px, calc(env(safe-area-inset-bottom) + 22px)); display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; }
+      .choice { min-width: 180px; padding: 0 24px; color: var(--ink); border: 1px solid rgba(35,31,53,.18); background: rgba(255,255,255,.76); font: 700 14px Arial, sans-serif; }
+      .choice.secondary { color: white; border-color: #7864a6; background: #7864a6; }
+      .back { position: absolute; z-index: 3; bottom: max(18px, env(safe-area-inset-bottom)); left: 0; right: 0; display: inline-block; margin: 0 auto; color: rgba(255,255,255,.78); background: none; border: 0; cursor: pointer; text-decoration: underline; font: 12px Arial, sans-serif; }
+      @media (max-width: 520px) { .choice { width: 100%; } }
+    </style>
+  </head>
+  <body>
+    <main>
+      <section id="intro" class="screen" aria-label="Intro video. Tap anywhere on the video to continue.">
+        <div class="card">
+          <p class="eyebrow">A moment for you</p>
+          <h1 id="intro-title">Something lovely awaits</h1>
+          <p class="subcopy">Press play when you’re ready for the little surprise.</p>
+          <div id="intro-tap-area" class="media-frame" role="button" tabindex="0" aria-label="Continue to the celebration">
+            <div class="placeholder-art"><span>Video placeholder</span></div>
+            <video id="intro-video" muted autoplay playsinline preload="auto" aria-label="Intro video placeholder">
+              <source src="IMG_9225.MP4" type="video/mp4" />
+            </video>
+          </div>
+        </div>
+      </section>
+
+      <section id="celebration" class="screen" aria-label="Celebration video">
+        <div class="card">
+          <div class="media-frame" aria-label="Celebration video">
+            <video id="celebration-video" autoplay loop muted playsinline preload="auto" aria-label="Celebration video">
+              <source src="Wedding_1.mp4" type="video/mp4" />
+            </video>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <audio id="celebration-audio" loop preload="auto">
+      <source src="media/celebration-audio.mp3" type="audio/mpeg" />
+    </audio>
+    <script>
+      const intro = document.querySelector('#intro');
+      const celebration = document.querySelector('#celebration');
+      const introVideo = document.querySelector('#intro-video');
+      const audio = document.querySelector('#celebration-audio');
+      let introFinished = false;
+      const openCelebration = () => {
+        if (!introFinished) return;
+        intro.hidden = true;
+        celebration.style.display = 'grid';
+        introVideo.pause();
+        audio.play().catch(() => {}); // Works after the user's button tap when an audio file is added.
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      };
+      document.querySelector('#intro-tap-area').addEventListener('click', openCelebration);
+      document.querySelector('#intro-tap-area').addEventListener('keydown', (event) => {
+        if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); openCelebration(); }
+      });
+      introVideo.addEventListener('loadedmetadata', () => {
+        introVideo.play().catch(() => {});
+      });
+      introVideo.addEventListener('timeupdate', () => {
+        if (!introFinished && introVideo.duration && introVideo.currentTime >= introVideo.duration - 0.08) {
+          introFinished = true;
+          introVideo.currentTime = Math.max(0, introVideo.duration - 0.08);
+          introVideo.pause();
+        }
+      });
+      introVideo.addEventListener('ended', () => {
+        introFinished = true;
+        introVideo.pause();
+      });
+    </script>
+  </body>
+</html>
